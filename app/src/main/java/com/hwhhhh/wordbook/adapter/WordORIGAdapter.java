@@ -42,7 +42,7 @@ public class WordORIGAdapter extends BaseAdapter {
         View contentView;
         ViewHolder viewHolder;
         if (view == null) {
-            contentView = LayoutInflater.from(mContext).inflate(R.layout.word_orig_list_item, null);
+            contentView = LayoutInflater.from(mContext).inflate(R.layout.item_word_orig, null);
             viewHolder = new ViewHolder();
             viewHolder.orig = contentView.findViewById(R.id.orig_item_eng);
             viewHolder.trans = contentView.findViewById(R.id.orig_item_chn);

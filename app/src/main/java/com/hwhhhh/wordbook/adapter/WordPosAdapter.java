@@ -1,7 +1,6 @@
 package com.hwhhhh.wordbook.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +43,7 @@ public class WordPosAdapter extends BaseAdapter {
         WordPartOfSpeech wordPartOfSpeech = (WordPartOfSpeech) getItem(i);
         ViewHolder viewHolder;
         if (view == null) {
-            contentView = LayoutInflater.from(mContext).inflate(R.layout.word_pos_list_item, null);
+            contentView = LayoutInflater.from(mContext).inflate(R.layout.item_word_pos, null);
             viewHolder = new ViewHolder();
             viewHolder.pos = contentView.findViewById(R.id.pos_item_pos);
             viewHolder.acceptation = contentView.findViewById(R.id.pos_item_acceptation);

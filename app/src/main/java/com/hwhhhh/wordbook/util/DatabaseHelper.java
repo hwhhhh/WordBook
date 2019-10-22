@@ -24,26 +24,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL(CREATE_USER);
-        Toast.makeText(mContext, "create successfully!", Toast.LENGTH_LONG).show();
+//        sqLiteDatabase.execSQL(CREATE_USER);
+//        Toast.makeText(mContext, "create successfully!", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("drop table if EXISTS tbl_user_info");
-        sqLiteDatabase.execSQL(CREATE_USER);
-        Toast.makeText(mContext, "update successfully!", Toast.LENGTH_LONG).show();
+//        sqLiteDatabase.execSQL("drop table if EXISTS tbl_user_info");
+//        sqLiteDatabase.execSQL(CREATE_USER);
+//        Toast.makeText(mContext, "update successfully!", Toast.LENGTH_LONG).show();
     }
 
     public void dropTable(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("DELETE FROM sqlite_sequence WHERE name = 'wordinfo';");
-        sqLiteDatabase.execSQL("DELETE FROM sqlite_sequence WHERE name = 'wordorig';");
-        sqLiteDatabase.execSQL("DELETE FROM sqlite_sequence WHERE name = 'wordpartofspeech';");
-        Toast.makeText(mContext, "drop successfully!", Toast.LENGTH_LONG).show();
+//        sqLiteDatabase.execSQL("DELETE FROM sqlite_sequence WHERE name = 'wordinfo';");
+//        sqLiteDatabase.execSQL("DELETE FROM sqlite_sequence WHERE name = 'wordorig';");
+//        sqLiteDatabase.execSQL("DELETE FROM sqlite_sequence WHERE name = 'wordpartofspeech';");
+//        Toast.makeText(mContext, "drop successfully!", Toast.LENGTH_LONG).show();
     }
 
     public void deleteDatabase(Context context) {
-        context.deleteDatabase("WordBook.db");
-        Toast.makeText(mContext, "delete successfully!", Toast.LENGTH_LONG).show();
+//        context.deleteDatabase("WordBook.db");
+//        Toast.makeText(mContext, "delete successfully!", Toast.LENGTH_LONG).show();
     }
 }

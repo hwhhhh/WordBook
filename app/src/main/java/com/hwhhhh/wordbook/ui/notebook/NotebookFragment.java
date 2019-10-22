@@ -12,10 +12,21 @@ import androidx.fragment.app.Fragment;
 import com.hwhhhh.wordbook.R;
 
 public class NotebookFragment extends Fragment {
-
+    private static NotebookFragment notebookFragment;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_notebook, container, false);
+    }
+
+    public static NotebookFragment getInstance() {
+        if (notebookFragment == null) {
+            synchronized (NotebookFragment.class) {
+                if (notebookFragment == null) {
+                    notebookFragment = new NotebookFragment();
+                }
+            }
+        }
+        return notebookFragment;
     }
 }

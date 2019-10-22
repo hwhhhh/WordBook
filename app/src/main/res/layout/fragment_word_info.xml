@@ -44,21 +44,70 @@
         app:layout_constraintStart_toEndOf="@id/item_word_pron_eng"
         app:layout_constraintTop_toBottomOf="@id/item_word" />
 
-        <ListView
-            android:id="@+id/listView_word_pos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:divider="@null"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/item_word_pron_eng" />
+    <ImageButton
+        android:id="@+id/word_info_imageButton"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:background="#0000"
+        app:srcCompat="@drawable/ic_star_hollow"
+        app:layout_constraintBottom_toTopOf="@id/item_word_pron_us"
+        app:layout_constraintHorizontal_bias="0.85"
+        app:layout_constraintLeft_toRightOf="@id/item_word"
+        app:layout_constraintRight_toRightOf="@id/word_info_button_modify"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ListView
-            android:id="@+id/listView_word_orig"
+    <ImageButton
+        android:id="@+id/word_info_button_modify"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:background="#0000"
+        app:srcCompat="@drawable/ic_modify"
+        app:layout_constraintLeft_toRightOf="@id/word_info_imageButton"
+        app:layout_constraintRight_toLeftOf="@id/word_info_button_delete"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/item_word_pron_us"
+        />
+
+    <ImageButton
+        android:id="@+id/word_info_button_delete"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:background="#0000"
+        app:srcCompat="@drawable/ic_delete"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/item_word_pron_us"
+        app:layout_constraintLeft_toRightOf="@id/word_info_button_modify"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+
+    <ScrollView
+        android:id="@+id/word_info_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/item_word_pron_eng"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/listView_word_pos" />
+            android:orientation="vertical">
+            <com.hwhhhh.wordbook.util.ListViewForScrollView
+                android:id="@+id/listView_word_pos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@null" />
+
+            <com.hwhhhh.wordbook.util.ListViewForScrollView
+                android:id="@+id/listView_word_orig"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" />
+        </LinearLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

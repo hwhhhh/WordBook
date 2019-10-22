@@ -5,48 +5,102 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.hwhhhh.wordbook.R;
 import com.hwhhhh.wordbook.adapter.WordORIGAdapter;
 import com.hwhhhh.wordbook.adapter.WordPosAdapter;
+import com.hwhhhh.wordbook.dao.WordDao;
 import com.hwhhhh.wordbook.dto.WordDto;
+import com.hwhhhh.wordbook.entity.Word;
 import com.hwhhhh.wordbook.entity.WordORIG;
 import com.hwhhhh.wordbook.entity.WordPartOfSpeech;
+import com.hwhhhh.wordbook.ui.home.HomeFragment;
+import com.hwhhhh.wordbook.util.MessageEvent;
 
-import java.util.ArrayList;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 
 public class WordInfoFragment extends Fragment {
     private static WordInfoFragment wordInfoFragment;
     private static final String TAG = "WordInfoFragment";
 
-    private ListView listViewPos, listViewOrig;
     private WordDto wordDto;
-    private List<WordPartOfSpeech> wordPartOfSpeeches = new ArrayList<>();
-    private List<WordORIG> wordORIGS = new ArrayList<>();
+    private String wordStr;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_word_info, container, false);
-        Log.d(TAG, "onCreateView: WordInfoFragment");
-        Bundle bundle = getArguments();
-        wordDto = (WordDto) bundle.getSerializable("data");
-        Log.d(TAG, "onCreateView: " + wordDto.getWordInfo().toString());
-
-        return view;
+        Log.d(TAG, "onCreateView: ");
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+        return inflater.inflate(R.layout.fragment_word_info, container, false);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated: WordInfoFragment");
+        final ImageButton imageButton = getView().findViewById(R.id.word_info_imageButton);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                WordDao wordDao = WordDao.getInstance();
+                if (wordDao.isSaved(wordDto)) {
+                    wordDao.delete(wordDto);
+                    imageButton.setImageResource(R.drawable.ic_star_hollow);
+                } else {
+                    wordDao.saveWord(wordDto);
+                    imageButton.setImageResource(R.drawable.ic_star_solid);
+                }
+            }
+        });
+        Log.d(TAG, "onActivityCreated: ");
 
+        ImageButton deleteButton = getView().findViewById(R.id.word_info_button_delete);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                WordDao wordDao = WordDao.getInstance();
+                List<Word> words = wordDao.searchWord(wordStr);
+                if (wordDao.delete(words.get(0)) > 0) {
+                    Toast.makeText(getActivity(), "成功从本地词库删除！", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(), "此单词已从本地词库删除！", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        ImageButton modifyButton = getView().findViewById(R.id.word_info_button_modify);
+        modifyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                WordDao wordDao = WordDao.getInstance();
+                List<Word> words = wordDao.searchWord(wordStr);
+                Log.d(TAG, "onClick: " + words.get(0).toString());
+                EventBus.getDefault().post(new MessageEvent(words));
+
+                FragmentTransaction fragmentTransaction = HomeFragment.getInstance().getChildFragmentManager().beginTransaction();
+                fragmentTransaction
+                        .hide(wordInfoFragment)
+                        .show(LocalWordFragment.getInstance())
+                        .addToBackStack("toLocalWord")
+                        .commit();
+
+                HomeFragment.getInstance().currentFragment = LocalWordFragment.getInstance();
+            }
+        });
     }
 
     public static WordInfoFragment getInstance() {
@@ -60,26 +114,65 @@ public class WordInfoFragment extends Fragment {
         return wordInfoFragment;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView: ");
+    }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (wordDto != null) {
-            TextView word = getActivity().findViewById(R.id.item_word);
-            TextView word_eng = getActivity().findViewById(R.id.item_word_pron_eng);
-            TextView word_us = getActivity().findViewById(R.id.item_word_pron_us);
-            word.setText(wordDto.getWordInfo().getKey());
-            word_eng.setText(wordDto.getWordInfo().getPsENG());
-            word_us.setText(wordDto.getWordInfo().getPsUS());
+    public void onDestroy() {
+        super.onDestroy();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+        Log.d(TAG, "onDestroy: ");
+    }
 
-            //词性与释义
-            listViewPos = getActivity().findViewById(R.id.listView_word_pos);
-            wordPartOfSpeeches = wordDto.getWordPartOfSpeeches();
-            listViewPos.setAdapter(new WordPosAdapter(getActivity(), wordPartOfSpeeches));
-            //双语例句
-            listViewOrig = getActivity().findViewById(R.id.listView_word_orig);
-            wordORIGS = wordDto.getWordORIGs();
-            listViewOrig.setAdapter(new WordORIGAdapter(getActivity(), wordORIGS));
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+
+        WordDao wordDao = WordDao.getInstance();
+        ImageButton imageButton = getView().findViewById(R.id.word_info_imageButton);
+
+        if (!hidden) {
+            if (wordDto != null) {
+                if (wordDao.isSaved(wordDto)) {
+                    Log.d(TAG, "onHiddenChanged:1  " + wordDto.getWordInfo().getKey());
+                    imageButton.setImageResource(R.drawable.ic_star_solid);
+                } else {
+                    imageButton.setImageResource(R.drawable.ic_star_hollow);
+                }
+                ScrollView scrollView = getView().findViewById(R.id.word_info_scrollview);
+                scrollView.smoothScrollTo(0, 0 );
+                TextView word = getView().findViewById(R.id.item_word);
+                TextView word_eng = getView().findViewById(R.id.item_word_pron_eng);
+                TextView word_us = getView().findViewById(R.id.item_word_pron_us);
+                word.setText(wordDto.getWordInfo().getKey());
+                Log.d(TAG, "onHiddenChanged:2  " + wordDto.getWordInfo().getKey());
+                String eng = " 英:/" + wordDto.getWordInfo().getPsENG() + "/";
+                word_eng.setText(eng);
+                String us = " 美:/" + wordDto.getWordInfo().getPsUS() + "/";
+                word_us.setText(us);
+
+                //词性与释义
+                ListView listViewPos = getView().findViewById(R.id.listView_word_pos);
+                List<WordPartOfSpeech> wordPartOfSpeeches = wordDto.getWordPartOfSpeeches();
+                listViewPos.setAdapter(new WordPosAdapter(getActivity(), wordPartOfSpeeches));
+                //双语例句
+                ListView listViewOrig = getView().findViewById(R.id.listView_word_orig);
+                List<WordORIG> wordORIGS = wordDto.getWordORIGs();
+                listViewOrig.setAdapter(new WordORIGAdapter(getActivity(), wordORIGS));
+            }
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void showWordDto (MessageEvent messageEvent) {
+        if (messageEvent.getWordDto() != null) {
+            this.wordDto = messageEvent.getWordDto();
+            this.wordStr = wordDto.getWordInfo().getKey();
         }
     }
 

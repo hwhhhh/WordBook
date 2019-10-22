@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <litepal>
     <dbname value="WordBook" />
-    <version value="7" />
+    <version value="8" />
     <list>
         <mapping class="com.hwhhhh.wordbook.entity.UserInfo"></mapping>
         <mapping class="com.hwhhhh.wordbook.entity.WordInfo"></mapping>
         <mapping class="com.hwhhhh.wordbook.entity.WordPartOfSpeech"></mapping>
         <mapping class="com.hwhhhh.wordbook.entity.WordORIG"></mapping>
+        <mapping class="com.hwhhhh.wordbook.entity.Word"></mapping>
     </list>
     <case value="keep"></case>
 </litepal>

@@ -2,5 +2,5 @@
     <string name="app_name">WordBook</string>
     <string name="nav_title_home">主页</string>
     <string name="nav_title_notebook">生词本</string>
-    <string name="nav_title_user">我</string>
+    <string name="nav_title_user">帮助</string>
 </resources>

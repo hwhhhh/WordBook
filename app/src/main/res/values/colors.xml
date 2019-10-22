@@ -3,6 +3,9 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-
+    <color name="letterBackground">#0000</color>
     <color name="wordColor">#000</color>
+    <color name="wordTitleBackground">#F0F0F0</color>
+    <color name="bottomNavView">#F8F8F8</color>
+    <color name="dividerColor">#22000000</color>
 </resources>

@@ -34,6 +34,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
     implementation 'com.google.android.material:material:1.0.0'
+    implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'org.litepal.android:java:3.0.0'
     testImplementation 'junit:junit:4.12'
 }

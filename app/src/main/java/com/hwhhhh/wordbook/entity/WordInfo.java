@@ -19,6 +19,8 @@ public class WordInfo extends LitePalSupport {
     private String pronPsUS;
 //    //判断是否为中文
 //    private boolean isChinese;
+    @Column(defaultValue = "0")
+    private int like;
 
     public int getId() {
         return id;
@@ -68,13 +70,13 @@ public class WordInfo extends LitePalSupport {
         this.pronPsUS = pronPsUS;
     }
 
-//    public boolean isChinese() {
-//        return isChinese;
-//    }
-//
-//    public void setChinese(boolean chinese) {
-//        isChinese = chinese;
-//    }
+    public int getLike() {
+        return like;
+    }
+
+    public void setLike(int like) {
+        this.like = like;
+    }
 
     public String toString() {
         return "key=" + key +"\tpsENG" + psENG +  "\tpsUS" + psUS;
