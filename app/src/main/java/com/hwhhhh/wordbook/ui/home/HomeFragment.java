@@ -50,6 +50,7 @@ public class HomeFragment extends Fragment {
     private SearchFragment searchFragment = SearchFragment.getInstance();
     private LocalWordFragment localWordFragment =  LocalWordFragment.getInstance();
     public Fragment currentFragment = articleFragment;
+    private EditText editText;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        final EditText editText = getActivity().findViewById(R.id.search_view_editText);
+        editText = getActivity().findViewById(R.id.search_view_editText);
         Log.d(TAG, "onActivityCreated: " + editText.getText().toString());
         TextWatcher watcher = new TextWatcher() {
             @Override
@@ -77,7 +78,6 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                Log.d(TAG, "afterTextChanged: " + editable.toString());
                 WordDao wordDao = new WordDao();
                 List<Word> words = wordDao.searchWord(editable.toString());
                 EventBus.getDefault().post(new MessageEvent(words));
@@ -93,16 +93,6 @@ public class HomeFragment extends Fragment {
             }
         };
         editText.addTextChangedListener(watcher);
-        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if(!b){
-                    InputMethodManager manager = ((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE));
-                    if (manager != null)
-                        manager.hideSoftInputFromWindow(view.getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
-                }
-            }
-        });//点击键盘外收起软键盘
 
         ImageButton button_search = getActivity().findViewById(R.id.search_view_button);
         button_search.setOnClickListener(new View.OnClickListener() {
@@ -111,18 +101,10 @@ public class HomeFragment extends Fragment {
                 InputMethodManager manager = ((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE));
                 if (manager != null)
                     manager.hideSoftInputFromWindow(view.getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
-                try {
-                    String word = editText.getText().toString().trim();
-                    Log.d(TAG, "onClick: " + word + "( 1 )");
-                    if (!word.equals("")) {
-                        countDownLatch = new CountDownLatch(1);
-                        sentHttpRequest(getUrl(word));
-                        countDownLatch.await();
-                        EventBus.getDefault().postSticky(new MessageEvent(wordDto));//发送事件
-                        switchFragment(currentFragment, wordInfoFragment);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                String word = editText.getText().toString().trim();
+                Log.d(TAG, "onClick: " + word + "( 1 )");
+                if (!word.equals("")) {
+                    search(word);
                 }
             }
         });
@@ -215,5 +197,21 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         Log.d(TAG, "onDestroyView: ");
+    }
+
+    public void search(String word) {
+        try {
+            countDownLatch = new CountDownLatch(1);
+            sentHttpRequest(getUrl(word));
+            countDownLatch.await();
+            EventBus.getDefault().postSticky(new MessageEvent(wordDto));//发送事件
+            editText.setText("");
+            InputMethodManager manager = ((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE));
+            if (manager != null)
+                manager.hideSoftInputFromWindow(getView().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
+            switchFragment(currentFragment, wordInfoFragment);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

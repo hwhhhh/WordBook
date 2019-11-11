@@ -1,10 +1,13 @@
 package com.hwhhhh.wordbook.ui.home.wordInfo;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -31,7 +34,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class WordInfoFragment extends Fragment {
     private static WordInfoFragment wordInfoFragment;
@@ -39,6 +44,8 @@ public class WordInfoFragment extends Fragment {
 
     private WordDto wordDto;
     private String wordStr;
+    private MediaPlayer myMediaPlayerENG, myMediaPlayerUS;
+    private TextToSpeech textToSpeech;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -117,6 +124,8 @@ public class WordInfoFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        myMediaPlayerENG.release();
+        myMediaPlayerUS.release();
         Log.d(TAG, "onDestroyView: ");
     }
 
@@ -149,21 +158,59 @@ public class WordInfoFragment extends Fragment {
                 TextView word = getView().findViewById(R.id.item_word);
                 TextView word_eng = getView().findViewById(R.id.item_word_pron_eng);
                 TextView word_us = getView().findViewById(R.id.item_word_pron_us);
+
+                speakChina();
+                myMediaPlayerENG = new MediaPlayer();
+                myMediaPlayerENG.setLooping(false);
+                myMediaPlayerUS = new MediaPlayer();
+                myMediaPlayerUS.setLooping(false);
+                try {
+                    if (wordDto.getWordInfo().getPronPsENG() != null) {
+                        myMediaPlayerENG.setDataSource(wordDto.getWordInfo().getPronPsENG());
+                        myMediaPlayerENG.prepare();
+                    }
+                    if (wordDto.getWordInfo().getPronPsUS() != null) {
+                        myMediaPlayerUS.setDataSource(wordDto.getWordInfo().getPronPsUS());
+                        myMediaPlayerUS.prepare();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 word.setText(wordDto.getWordInfo().getKey());
-                Log.d(TAG, "onHiddenChanged:2  " + wordDto.getWordInfo().getKey());
                 String eng = " 英:/" + wordDto.getWordInfo().getPsENG() + "/";
                 word_eng.setText(eng);
                 String us = " 美:/" + wordDto.getWordInfo().getPsUS() + "/";
                 word_us.setText(us);
-
+                Log.d(TAG, "onHiddenChanged: " + wordDto.getWordInfo().getPronPsENG());
                 //词性与释义
                 ListView listViewPos = getView().findViewById(R.id.listView_word_pos);
                 List<WordPartOfSpeech> wordPartOfSpeeches = wordDto.getWordPartOfSpeeches();
                 listViewPos.setAdapter(new WordPosAdapter(getActivity(), wordPartOfSpeeches));
                 //双语例句
                 ListView listViewOrig = getView().findViewById(R.id.listView_word_orig);
-                List<WordORIG> wordORIGS = wordDto.getWordORIGs();
+                final List<WordORIG> wordORIGS = wordDto.getWordORIGs();
                 listViewOrig.setAdapter(new WordORIGAdapter(getActivity(), wordORIGS));
+                listViewOrig.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        textToSpeech.speak(wordORIGS.get(i).getOrig(), TextToSpeech.QUEUE_FLUSH, null);
+                    }
+                });
+
+                word_eng.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        myMediaPlayerENG.start();
+                    }
+                });
+
+                word_us.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        myMediaPlayerUS.start();
+                    }
+                });
             }
         }
     }
@@ -176,4 +223,14 @@ public class WordInfoFragment extends Fragment {
         }
     }
 
+    private void speakChina() {
+        textToSpeech = new TextToSpeech(getActivity(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if (i == TextToSpeech.SUCCESS) {
+                    int supported = textToSpeech.setLanguage(Locale.US);
+                }
+            }
+        });
+    }
 }

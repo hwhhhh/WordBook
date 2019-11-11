@@ -5,28 +5,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.hwhhhh.wordbook.ui.home.HomeFragment;
-import com.hwhhhh.wordbook.ui.home.wordInfo.LocalWordFragment;
 import com.hwhhhh.wordbook.ui.home.wordInfo.WordInfoFragment;
 import com.hwhhhh.wordbook.ui.notebook.NotebookFragment;
-import com.hwhhhh.wordbook.ui.user.AddFragment;
 import com.hwhhhh.wordbook.ui.user.UserFragment;
-import com.hwhhhh.wordbook.util.DBHelper;
 
 import org.litepal.LitePal;
 

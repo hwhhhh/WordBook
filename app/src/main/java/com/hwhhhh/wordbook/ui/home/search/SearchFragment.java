@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import com.hwhhhh.wordbook.R;
 import com.hwhhhh.wordbook.adapter.WordListAdapter;
 import com.hwhhhh.wordbook.adapter.WordSearchAdapter;
 import com.hwhhhh.wordbook.entity.Word;
+import com.hwhhhh.wordbook.ui.home.HomeFragment;
 import com.hwhhhh.wordbook.util.MessageEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -61,8 +63,14 @@ public class SearchFragment extends Fragment {
         super.onHiddenChanged(hidden);
         if (!hidden) {
             if (this.words != null) {
-                ListView listView = getView().findViewById(R.id.search_listView_fuzzySearch);
+                final ListView listView = getView().findViewById(R.id.search_listView_fuzzySearch);
                 listView.setAdapter(new WordSearchAdapter(getActivity(), words));
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        HomeFragment.getInstance().search(words.get(i).getWord());
+                    }
+                });
             }
         }
     }
